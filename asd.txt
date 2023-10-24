@@ -1,0 +1,199 @@
+given:
+1-Struct containing the metadata of each block
+struct BlockMetaData
+{
+uint8 is free; //is_free block?
+uint32 size; //block size (including size of its meta data)
+ LIST_ENTRY (BlockMetaData) prev_next_info; /* Linked List Links */
+}
+2-Macro to get the size of the metadata struct
+     #define sizeOfMetaData() (sizeof(struct BlockMetaData))
+3-List head struct (MemBlock_LIST) to be used to define any list of BlockMetaData
+     LIST_HEAD (MemBlock_LIST, BlockMetaData);
+
+implement only this :
+void initialize_dynamic_allocator
+(uint32 daStart, uint32 initSizeOfAllocatedSpace);
+Description:
+◦ Initialize the dynamic allocator starting from the given address “daStart” with the given allocated space 
+“initSizeOfAllocatedSpace”
+◦ Block list and metadata of the first free block should be initialized here
+void *alloc_block_FF(uint32 required_size)
+Description:
+◦ Find the first block the fit the required_size in addition to the size of its metadata (First Fit 
+strategy)
+◦ If no sufficiently large free block is found, use sbrk to create more space on the heap.
+◦ If the found block of memory is so large that it can accommodate both the newly allocated block 
+and another block in addition, then the large block is split in two; one block to hold the newly 
+allocated block, the other to be a residual free block.
+Return:
+◦ Make sure the returned pointer points to the beginning of the allocated space, not metadata header.
+◦ NULL if cannot allocate the new requested size (after sbrk)
+◦ NULL if the requested size is 0
+(note Using Global var is not allowed and dont call function from another functon you can use what i give for help)
+
+for help:
+Get size of the block at the given address
+uint32 get_block_size(void* va);
+Check the status of the block at the given address
+int8 is_free_block(void* va);
+Print the elements of a given block list
+void print_blocks_list(struct MemBlock_LIST list);
+
+To define a LIST that points to objects of type struct my_struct:
+Create a list head that holds info about the list (size, head, tail).
+LIST_HEAD([LIST_TYPE_DEF], [STRUCT NAME THAT WILL POINTS TO]);
+
+Add next and previous pointers to the struct
+LIST_ENTRY([STRUCT NAME]) prev_next_info;
+
+Define your list 
+struct [LIST_TYPE_DEF] my_list
+Set of helper ready made functions are available in Appendix II here
+Convert from string to integer 
+Function prototype:
+long strtol(const char *s, char **endptr, int base)
+Arguments:
+S: string to be converted 
+Endptr: if you want to return a pointer to the last character after finishing the conversion (set it to NULL)
+Base: number system to be used for conversion (10 for decimal, 16 for hexadecimal…)
+Return:
+Long containing the integer value 
+Source file:
+String.h - String.c
+String split 
+Function prototype:
+int strsplit(char *string, char *SPLIT_CHARS, char **argv, int * argc)
+Arguments:
+string: string to be split
+SPLIT_CHARS: splitting characters 
+argv: array of strings after splitting
+argc: number of split strings (i.e. size of the argv array)
+Return:
+1 if succeed, 0 otherwise
+String Length 
+Function prototype:
+int strlen(const char *s) 
+Arguments:
+s: string to get its length
+Return:
+length (# of characters) of the given string
+
+String Comparison
+Function prototype:
+int strncmp(const char *p, const char *q, uint32 n)
+Compare the first "n" characters from string "p" with corresponding characters in string "q"
+Arguments:
+p: first string to be compared
+q: second string to compare with it
+n: number of characters to be compared
+Return:
+0 if identical match, +ve/-ve value otherwise
+Find Character in String
+Function prototype:
+char * strfind(const char *s, char c)
+Return a pointer to the first occurrence of 'c' in 's', or a pointer to the string-ending null character if the string has no 'c'
+Arguments:
+s: string 
+c: character to search with it
+Initialize the List
+Description: 
+Initialize the given list by zeroing its size, head and tail pointers
+Function declaration: 
+LIST_INIT(Linked_List* list)
+Parameters:
+list: pointer to the linked list to loop on its elements
+iterator: pointer to the current element in the list 
+Iterate on ALL Elements of a Specific List
+Description: 
+Used to loop on all frames in the given list
+Function declaration: 
+LIST_FOREACH (Type_inside_list* iterator, Linked_List* list)
+Parameters:
+list: pointer to the linked list to loop on its elements
+iterator: pointer to the current element in the list 
+Example: 
+
+Get the size of any list 
+Description: 
+Used to retrieve the current size of a given list
+Function declaration: 
+int size = LIST_SIZE(Linked_List * list)
+Parameters:
+list: pointer to the linked list 
+Example: 
+
+Get the last element in a list 
+Description: 
+Used to retrieve the last element in a list
+Function declaration: 
+Type_inside_list* element = LIST_LAST(Linked_List * list)
+Parameters:
+list: pointer to the linked list 
+Get the first element in a list 
+Description: 
+Used to retrieve the first element in a list (what the head points to)
+Function declaration: 
+Type_inside_list* element = LIST_FIRST(Linked_List * list)
+Parameters:
+list: pointer to the linked list 
+
+Get the previous element to another element in a list 
+Description: 
+Used to retrieve the previous element to another in a list
+Function declaration: 
+Type_inside_list* element = LIST_PREV(Type_inside_list* element)
+Parameters:
+element: is the element to get its previous 
+
+Get the next element to another element in a list 
+Description: 
+Used to retrieve the next element to another in a list
+Function declaration: 
+Type_inside_list* element = LIST_NEXT(Type_inside_list* element)
+Parameters:
+element: is the element to get its next 
+
+Remove a specific element in a list 
+Description: 
+Used to remove an given element from a list 
+Function declaration: 
+LIST_REMOVE(Linked_List * list, Type_inside_list* element)
+Parameters:
+list: pointer to the linked list 
+element: is the element to be removed from the given list
+Insert a new element at the BEGINNING of a list 
+Description: 
+Used to insert a new element at the head of a list
+Function declaration: 
+LIST_INSERT_HEAD(Linked_List * list, Type_inside_list* element)
+Parameters:
+list: pointer to the linked list 
+element: the new element to be inserted at the head of list
+Insert a new element at the END of a list 
+Description: 
+Used to insert a new element at the tail of a list
+Function declaration: 
+LIST_INSERT_TAIL(Linked_List * list, Type_inside_list* element)
+Parameters:
+list: pointer to the linked list 
+element: the new element to be inserted at the tail of list
+Insert a new element AFTER a specific element in a list 
+Description: 
+Used to insert a new element after a specific element in a list
+Function declaration: 
+LIST_INSERT_AFTER(Linked_List * list, Type_inside_list* listElem, Type_inside_list* elemToInsert)
+Parameters:
+list: pointer to the linked list 
+listElem: the element in the list to insert after it 
+elemToInsert: the new element to be inserted after the listElem 
+Insert a new element BEFORE a specific element in a list 
+Description: 
+Used to insert a new element before a specific element in a list
+Function declaration: 
+LIST_INSERT_BEFORE(Linked_List * list, Type_inside_list* listElem, Type_inside_list* elemToInsert)
+Parameters:
+list: pointer to the linked list 
+listElem: the element in the list to insert before it 
+elemToInsert: the new element to be inserted before the listElem 
+
